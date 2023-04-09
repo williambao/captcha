@@ -203,6 +203,6 @@ func VerifyStringOnly(id string, digits string) bool {
 			return false
 		}
 	}
-	return Verify(id, ns)
+	return VerifyOnly(id, ns)
 }
 
