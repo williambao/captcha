@@ -163,3 +163,46 @@ func VerifyString(id string, digits string) bool {
 	}
 	return Verify(id, ns)
 }
+
+
+
+// Verify returns true if the given digits are the ones that were used to
+// create the given captcha id.
+//
+// The function deletes the captcha with the given id from the internal
+// storage, so that the same captcha can't be verified anymore.
+// don't remove captcha after verify
+func VerifyOnly(id string, digits []byte) bool {
+	if digits == nil || len(digits) == 0 {
+		return false
+	}
+	reald := globalStore.Get(id, false)
+	if reald == nil {
+		return false
+	}
+	return bytes.Equal(digits, reald)
+}
+
+// VerifyString is like Verify, but accepts a string of digits.  It removes
+// spaces and commas from the string, but any other characters, apart from
+// digits and listed above, will cause the function to return false.
+// dont't remove captcha after verify
+func VerifyStringOnly(id string, digits string) bool {
+	if digits == "" {
+		return false
+	}
+	ns := make([]byte, len(digits))
+	for i := range ns {
+		d := digits[i]
+		switch {
+		case '0' <= d && d <= '9':
+			ns[i] = d - '0'
+		case d == ' ' || d == ',':
+			// ignore
+		default:
+			return false
+		}
+	}
+	return Verify(id, ns)
+}
+
